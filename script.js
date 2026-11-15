@@ -123,12 +123,18 @@ const hazardZones = [
    longitude/latitude coordinates aligned with the NASA tiles.
 */
 
+const MarsCRS = L.extend({}, L.CRS.EPSG4326, {
+    scale: function (zoom) {
+        return 512 * Math.pow(2, zoom);
+    }
+});
+
 const map = L.map("map", {
-    crs: L.CRS.EPSG4326,
+    crs: MarsCRS,
     center: [locations.gale.lat, locations.gale.lon],
-    zoom: locations.gale.zoom,
-    minZoom: 2,
-    maxZoom: 10,
+    zoom: 3,
+    minZoom: 0,
+    maxZoom: 8,
     worldCopyJump: false
 });
 

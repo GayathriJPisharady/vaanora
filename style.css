@@ -1,421 +1,811 @@
+/* ============================================================
+   VAANORA
+   MARTIAN SURFACE INTELLIGENCE
+   NASA SPACE APPS 2026
+   ============================================================ */
+
+
+/* ============================================================
+   GLOBAL
+   ============================================================ */
+
 * {
     box-sizing: border-box;
+}
+
+html,
+body {
     margin: 0;
     padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+    background: #090a0c;
+    color: #f2f2f2;
 }
 
 body {
-    font-family: Arial, Helvetica, sans-serif;
-    background: #07090d;
-    color: #f4f5f7;
-    overflow: hidden;
+    letter-spacing: 0.01em;
 }
+
+
+/* ============================================================
+   MAIN APP
+   ============================================================ */
 
 .app {
     display: flex;
-    height: 100vh;
     width: 100vw;
+    height: 100vh;
+    overflow: hidden;
 }
 
-/* SIDEBAR */
+
+/* ============================================================
+   SIDEBAR
+   ============================================================ */
 
 .sidebar {
-    width: 340px;
-    min-width: 340px;
-    background: #0b0e13;
-    border-right: 1px solid #242a32;
-    display: flex;
-    flex-direction: column;
-    padding: 24px;
+    width: 420px;
+    min-width: 420px;
+    height: 100vh;
+    padding: 30px;
+    background: #0b0e12;
+    border-right: 1px solid #252a30;
+    overflow-y: auto;
     z-index: 1000;
 }
+
+
+/* ============================================================
+   BRAND
+   ============================================================ */
 
 .brand {
     display: flex;
     align-items: center;
-    gap: 12px;
-    margin-bottom: 18px;
-}
-
-.logo {
-    width: 42px;
-    height: 42px;
-    border: 1px solid #8d9aaa;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 22px;
-    font-weight: 700;
-    border-radius: 8px;
-}
-
-.brand h1 {
-    font-size: 20px;
-    letter-spacing: 3px;
-}
-
-.brand span {
-    display: block;
-    font-size: 8px;
-    color: #89929e;
-    letter-spacing: 1px;
-    margin-top: 3px;
-}
-
-.mission-badge {
-    font-size: 9px;
-    letter-spacing: 1.5px;
-    border: 1px solid #333b45;
-    color: #aab3be;
-    padding: 8px 10px;
-    border-radius: 5px;
-    text-align: center;
-    margin-bottom: 24px;
-}
-
-.panel-section {
-    border-top: 1px solid #242a32;
-    padding-top: 18px;
+    gap: 15px;
     margin-bottom: 22px;
 }
 
-.panel-section h3 {
-    font-size: 10px;
-    letter-spacing: 2px;
-    color: #89929e;
-    margin-bottom: 15px;
+.brand-mark {
+    width: 52px;
+    height: 52px;
+    border: 1px solid #7d8792;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 25px;
+    font-weight: 700;
+    color: #ffffff;
 }
 
-.panel-section > label {
-    display: block;
-    font-size: 9px;
-    letter-spacing: 1px;
-    color: #777f8a;
-    margin: 13px 0 6px;
+.brand-name {
+    font-size: 25px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
 }
+
+.brand-subtitle {
+    margin-top: 4px;
+    color: #7f91a5;
+    font-size: 10px;
+    letter-spacing: 0.16em;
+}
+
+
+/* ============================================================
+   NASA BADGE
+   ============================================================ */
+
+.mission-badge {
+    width: 100%;
+    padding: 11px 12px;
+    border: 1px solid #303740;
+    border-radius: 6px;
+    text-align: center;
+    color: #9cb0c7;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    margin-bottom: 28px;
+}
+
+
+/* ============================================================
+   DIVIDERS
+   ============================================================ */
+
+.sidebar hr,
+.section-divider {
+    border: 0;
+    border-top: 1px solid #282d33;
+    margin: 26px 0;
+}
+
+
+/* ============================================================
+   SECTION HEADINGS
+   ============================================================ */
+
+.section-title {
+    margin-bottom: 18px;
+    color: #8192a6;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+}
+
+
+/* ============================================================
+   FORM LABELS
+   ============================================================ */
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    color: #75869a;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+}
+
+
+/* ============================================================
+   SELECTS
+   ============================================================ */
 
 select {
     width: 100%;
-    background: #11151b;
-    color: #e8eaed;
-    border: 1px solid #303741;
-    border-radius: 5px;
-    padding: 11px;
+    height: 50px;
+    margin-bottom: 18px;
+    padding: 0 16px;
+    border: 1px solid #303740;
+    border-radius: 6px;
     outline: none;
-}
-
-.priority-options {
-    display: flex;
-    gap: 8px;
-    margin-top: 8px;
-}
-
-.radio {
-    flex: 1;
-    border: 1px solid #303741;
-    padding: 9px;
-    border-radius: 5px;
-    text-align: center;
+    background: #11151a;
+    color: #f1f1f1;
+    font-size: 15px;
     cursor: pointer;
-    font-size: 10px;
-    color: #aeb5bd;
 }
 
-.radio input {
-    display: none;
+select:hover {
+    border-color: #59636f;
 }
 
-.radio:has(input:checked) {
-    border-color: #d5d9de;
-    color: white;
-    background: #191e25;
+select:focus {
+    border-color: #aab4bf;
 }
+
+
+/* ============================================================
+   MISSION PRIORITY
+   ============================================================ */
+
+.priority-container {
+    display: flex;
+    gap: 9px;
+    margin-bottom: 20px;
+}
+
+.priority-container button {
+    flex: 1;
+}
+
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
 
 button {
-    width: 100%;
-    margin-top: 18px;
-    background: #e8eaed;
-    color: #0a0c10;
-    border: none;
-    border-radius: 5px;
-    padding: 13px;
-    font-size: 10px;
-    font-weight: bold;
-    letter-spacing: 1.5px;
+    height: 43px;
+    padding: 0 16px;
+    border: 1px solid #303740;
+    border-radius: 6px;
+    outline: none;
+    background: #11151a;
+    color: #bfc7d0;
+    font-size: 13px;
     cursor: pointer;
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.15s ease;
 }
 
 button:hover {
-    background: white;
+    border-color: #8b949e;
+    color: #ffffff;
 }
 
-.layer {
-    display: flex !important;
+button:active {
+    transform: scale(0.98);
+}
+
+
+/* ============================================================
+   ACTIVE PRIORITY BUTTON
+   ============================================================ */
+
+.priority-active {
+    border-color: #ffffff !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+}
+
+
+/* ============================================================
+   GENERATE BUTTON
+   ============================================================ */
+
+.generate-button {
+    width: 100%;
+    height: 50px;
+    margin-top: 2px;
+    border-color: #ffffff;
+    background: #f1f3f5;
+    color: #090a0c;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+}
+
+.generate-button:hover {
+    border-color: #ffffff;
+    background: #ffffff;
+    color: #000000;
+}
+
+
+/* ============================================================
+   MAP LAYERS
+   ============================================================ */
+
+.layer-list {
+    display: flex;
+    flex-direction: column;
+    gap: 13px;
+}
+
+.layer-item {
+    display: flex;
     align-items: center;
-    gap: 8px;
-    color: #d4d8dd !important;
-    font-size: 11px !important;
-    margin: 11px 0 !important;
+    justify-content: space-between;
+    margin: 0;
+    color: #d7dce1;
+    font-size: 14px;
+    letter-spacing: 0;
+    text-transform: none;
     cursor: pointer;
 }
 
-.layer input {
-    accent-color: #dfe3e8;
+.layer-item-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
-.layer small {
-    margin-left: auto;
-    color: #6d7580;
-    font-size: 8px;
+.layer-source {
+    color: #687586;
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
 }
+
+
+/* ============================================================
+   CHECKBOXES
+   ============================================================ */
+
+input[type="checkbox"] {
+    width: 15px;
+    height: 15px;
+    margin: 0;
+    accent-color: #ffffff;
+    cursor: pointer;
+}
+
+
+/* ============================================================
+   NASA DATA SOURCES
+   ============================================================ */
 
 .data-source {
-    display: flex;
-    justify-content: space-between;
-    border-bottom: 1px solid #1e242b;
-    padding: 9px 0;
+    margin-bottom: 15px;
 }
 
-.data-source strong {
+.data-source-name {
+    color: #dce1e5;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.data-source-description {
+    margin-top: 4px;
+    color: #6f7c8b;
     font-size: 10px;
+    line-height: 1.5;
 }
 
-.data-source span {
-    font-size: 9px;
-    color: #727b86;
-}
 
-.footer {
-    margin-top: auto;
-    padding-top: 15px;
-    border-top: 1px solid #242a32;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    color: #59616c;
-    font-size: 8px;
-}
-
-/* MAIN */
+/* ============================================================
+   MAIN CONTENT
+   ============================================================ */
 
 .main {
     position: relative;
     flex: 1;
     height: 100vh;
+    overflow: hidden;
+    background: #101113;
 }
+
+
+/* ============================================================
+   TOP BAR
+   ============================================================ */
 
 .topbar {
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
+    height: 145px;
+    padding: 32px 36px;
     z-index: 500;
-    background: linear-gradient(
-        to bottom,
-        rgba(5, 7, 10, 0.96),
-        rgba(5, 7, 10, 0)
-    );
-    padding: 24px 30px 45px;
-    display: flex;
-    justify-content: space-between;
     pointer-events: none;
+    background:
+        linear-gradient(
+            to bottom,
+            rgba(8, 9, 10, 0.96),
+            rgba(8, 9, 10, 0.78),
+            rgba(8, 9, 10, 0)
+        );
+}
+
+.topbar-content {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
 }
 
 .eyebrow {
-    display: block;
-    font-size: 9px;
-    letter-spacing: 2px;
-    color: #858e99;
-    margin-bottom: 5px;
+    margin-bottom: 8px;
+    color: #8794a3;
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
 }
 
+.topbar h1,
 .topbar h2 {
-    font-size: 27px;
-    letter-spacing: 4px;
+    margin: 0;
+    color: #f5f5f5;
+    font-size: 34px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
 }
 
-.status {
-    height: fit-content;
-    background: rgba(12, 15, 20, 0.9);
-    border: 1px solid #2b323b;
-    padding: 9px 12px;
-    border-radius: 5px;
-    font-size: 9px;
-    letter-spacing: 1px;
+
+/* ============================================================
+   MODE INDICATOR
+   ============================================================ */
+
+.mode-indicator {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 16px;
+    border: 1px solid #303740;
+    border-radius: 6px;
+    color: #d5d9dd;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    pointer-events: auto;
 }
 
-.status-dot {
-    display: inline-block;
-    width: 7px;
-    height: 7px;
-    background: #c7cbd0;
+.mode-dot {
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
-    margin-right: 7px;
+    background: #dce2e7;
 }
+
+
+/* ============================================================
+   MAP
+   ============================================================ */
 
 #map {
     position: absolute;
     inset: 0;
-    background: #161616;
+    width: 100%;
+    height: 100%;
+    background: #121416;
 }
 
-/* MAP OVERLAY */
 
-.map-overlay {
+/* ============================================================
+   MAP COORDINATES
+   ============================================================ */
+
+.coordinates,
+#coordinates,
+.map-coordinates {
     position: absolute;
-    z-index: 500;
-    left: 25px;
-    bottom: 170px;
+    left: 28px;
+    bottom: 190px;
+    z-index: 600;
+    padding: 10px 14px;
+    border: 1px solid #303740;
+    border-radius: 6px;
+    background: rgba(8, 10, 12, 0.9);
+    color: #dbe1e6;
+    font-size: 12px;
+    letter-spacing: 0.08em;
     pointer-events: none;
 }
 
-.coordinates {
-    background: rgba(8, 10, 14, 0.9);
-    border: 1px solid #343b44;
-    border-radius: 5px;
-    padding: 10px;
-    display: flex;
-    gap: 8px;
-    align-items: center;
-}
 
-.coordinates span {
-    color: #6f7781;
-    font-size: 8px;
-}
+/* ============================================================
+   REGION LABEL
+   ============================================================ */
 
-.coordinates strong {
-    font-size: 10px;
-}
-
-.map-label {
-    margin-top: 8px;
-    font-size: 9px;
-    letter-spacing: 1.5px;
-    color: #aab1b9;
-}
-
-/* BOTTOM */
-
-.bottom-panel {
+.region-label {
     position: absolute;
-    z-index: 500;
-    bottom: 20px;
-    left: 25px;
-    right: 25px;
-    background: rgba(9, 12, 16, 0.94);
+    left: 28px;
+    bottom: 155px;
+    z-index: 600;
+    color: #8592a0;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    pointer-events: none;
+}
+
+
+/* ============================================================
+   ROUTE ANALYSIS PANEL
+   ============================================================ */
+
+.route-analysis {
+    position: absolute;
+    left: 28px;
+    right: 28px;
+    bottom: 22px;
+    min-height: 92px;
+    z-index: 700;
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    padding: 20px 24px;
     border: 1px solid #303740;
     border-radius: 7px;
-    padding: 16px 20px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    background: rgba(7, 10, 13, 0.94);
     backdrop-filter: blur(10px);
 }
 
-.route-status {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
 
-.status-icon {
-    width: 32px;
-    height: 32px;
-    border: 1px solid #7f8994;
+/* ============================================================
+   ROUTE STATUS ICON
+   ============================================================ */
+
+.route-status-icon {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    border: 1px solid #7d8791;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
+    color: #ffffff;
+    font-size: 19px;
 }
 
-.route-status h3 {
-    font-size: 13px;
+
+/* ============================================================
+   ROUTE TEXT
+   ============================================================ */
+
+.route-content {
+    flex: 1;
+}
+
+.route-label {
     margin-bottom: 4px;
+    color: #7c8997;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
 }
 
-.route-status p {
-    color: #727b85;
-    font-size: 9px;
+.route-title {
+    color: #f0f2f4;
+    font-size: 15px;
+    font-weight: 700;
 }
 
-.stats {
+.route-description {
+    margin-top: 5px;
+    color: #707c89;
+    font-size: 10px;
+}
+
+
+/* ============================================================
+   STATISTICS
+   ============================================================ */
+
+.route-stats {
     display: flex;
-    gap: 28px;
+    align-items: center;
+    gap: 32px;
 }
 
 .stat {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    text-align: right;
+    min-width: 70px;
 }
 
-.stat span {
-    font-size: 8px;
-    letter-spacing: 1px;
-    color: #6e7782;
+.stat-label {
+    margin-bottom: 6px;
+    color: #697686;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
 }
 
-.stat strong {
-    font-size: 15px;
+.stat-value {
+    color: #f2f3f4;
+    font-size: 19px;
+    font-weight: 700;
 }
 
-/* LEAFLET */
+
+/* ============================================================
+   LEAFLET OVERRIDES
+   ============================================================ */
+
+.leaflet-container {
+    background: #101214;
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+}
+
+.leaflet-control-zoom {
+    border: 1px solid #303740 !important;
+    box-shadow: none !important;
+}
 
 .leaflet-control-zoom a {
-    background: #0b0e13 !important;
-    color: white !important;
+    background: #0d1013 !important;
+    color: #dce1e5 !important;
     border-color: #303740 !important;
 }
 
+.leaflet-control-zoom a:hover {
+    background: #1a1e23 !important;
+}
+
+.leaflet-control-attribution {
+    background: rgba(8, 10, 12, 0.8) !important;
+    color: #778391 !important;
+    font-size: 9px !important;
+}
+
+.leaflet-control-attribution a {
+    color: #9ba8b5 !important;
+}
+
+
+/* ============================================================
+   POPUPS
+   ============================================================ */
+
 .leaflet-popup-content-wrapper,
 .leaflet-popup-tip {
-    background: #0b0e13;
-    color: white;
+    background: #101419;
+    color: #e8ebee;
+}
+
+.leaflet-popup-content-wrapper {
+    border: 1px solid #303740;
 }
 
 .leaflet-popup-content {
-    font-size: 11px;
+    margin: 14px;
+    font-size: 12px;
+    line-height: 1.6;
 }
 
-/* RESPONSIVE */
+.leaflet-popup-content strong {
+    color: #ffffff;
+    font-size: 13px;
+}
 
-@media(max-width: 900px) {
+.leaflet-popup-close-button {
+    color: #aab3bc !important;
+}
+
+
+/* ============================================================
+   MAP LEGEND
+   ============================================================ */
+
+.map-legend {
+    position: absolute;
+    right: 28px;
+    top: 170px;
+    z-index: 600;
+    padding: 14px 16px;
+    border: 1px solid #303740;
+    border-radius: 6px;
+    background: rgba(8, 10, 12, 0.88);
+    backdrop-filter: blur(8px);
+}
+
+.legend-title {
+    margin-bottom: 10px;
+    color: #7d8996;
+    font-size: 9px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 7px;
+    color: #bfc7cf;
+    font-size: 10px;
+}
+
+.legend-item:last-child {
+    margin-bottom: 0;
+}
+
+.legend-dot {
+    width: 8px;
+    height: 8px;
+    border: 1px solid #ffffff;
+    border-radius: 50%;
+}
+
+
+/* ============================================================
+   SCROLLBAR
+   ============================================================ */
+
+.sidebar::-webkit-scrollbar {
+    width: 5px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+    background: #0b0e12;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+    background: #303740;
+    border-radius: 10px;
+}
+
+
+/* ============================================================
+   TABLET
+   ============================================================ */
+
+@media (max-width: 1100px) {
 
     .sidebar {
-        width: 270px;
-        min-width: 270px;
-        padding: 16px;
+        width: 330px;
+        min-width: 330px;
+        padding: 24px;
     }
 
-    .bottom-panel {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 15px;
+    .topbar {
+        padding-left: 28px;
+        padding-right: 28px;
     }
 
-    .stats {
-        width: 100%;
-        justify-content: space-between;
+    .topbar h1,
+    .topbar h2 {
+        font-size: 28px;
+    }
+
+    .route-analysis {
+        left: 20px;
+        right: 20px;
+    }
+
+    .route-stats {
+        gap: 18px;
     }
 
 }
 
-@media(max-width: 700px) {
+
+/* ============================================================
+   MOBILE
+   ============================================================ */
+
+@media (max-width: 700px) {
 
     .sidebar {
         display: none;
     }
 
-    .topbar h2 {
-        font-size: 20px;
+    .main {
+        width: 100vw;
     }
 
-}
+    .topbar {
+        height: 110px;
+        padding: 22px 18px;
+    }
 
-.priority-active {
-    border-color: #ffffff !important;
-    background: #ffffff !important;
-    color: #000000 !important;
+    .topbar h1,
+    .topbar h2 {
+        font-size: 22px;
+    }
+
+    .eyebrow {
+        font-size: 8px;
+    }
+
+    .mode-indicator {
+        padding: 8px 10px;
+        font-size: 8px;
+    }
+
+    .route-analysis {
+        left: 12px;
+        right: 12px;
+        bottom: 12px;
+        padding: 15px;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .route-content {
+        min-width: 150px;
+    }
+
+    .route-stats {
+        width: 100%;
+        justify-content: space-between;
+        gap: 8px;
+    }
+
+    .stat {
+        min-width: auto;
+    }
+
+    .stat-value {
+        font-size: 15px;
+    }
+
+    .coordinates,
+    #coordinates,
+    .map-coordinates {
+        left: 12px;
+        bottom: 155px;
+        font-size: 10px;
+    }
+
+    .region-label {
+        left: 12px;
+        bottom: 125px;
+    }
+
 }

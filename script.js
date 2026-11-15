@@ -1,370 +1,780 @@
-// ==========================================
-// VAANORA
-// Martian Surface Intelligence
-// NASA Space Apps Challenge 2026
-// ==========================================
+/* =========================================================
+   VAANORA - MARTIAN SURFACE INTELLIGENCE
+   NASA DATA INTEGRATION
+   NASA Solar System Treks / Mars Trek
+   ========================================================= */
 
+/* ---------- NASA DATA SOURCES ---------- */
 
-// ---------- MARS MAP ----------
+// NASA MOLA Global Color Hillshade
+const NASA_MOLA =
+  "https://trek.nasa.gov/tiles/Mars/EQ/Mars_MGS_MOLA_ClrShade_merge_global_463m/1.0.0/default/default028mm/{z}/{y}/{x}.jpg";
 
-const map = L.map("map", {
-    zoomControl: true,
-    minZoom: 2,
-    maxZoom: 8
-}).setView([-5.4, 137.8], 4);
+// NASA CTX Gale Crater mosaic
+const NASA_CTX_GALE =
+  "https://trek.nasa.gov/tiles/Mars/EQ/Gale_CTX_BlockAdj_dd/1.0.0/default/default028mm/{z}/{y}/{x}.jpg";
 
+// NASA CTX Jezero mosaic
+const NASA_CTX_JEZERO =
+  "https://trek.nasa.gov/tiles/Mars/EQ/Jezero_CTX_BlockAdj_dd/1.0.0/default/default028mm/{z}/{y}/{x}.jpg";
 
-// Dark Mars-style base map.
-// The prototype uses a neutral dark planetary map
-// and overlays mission/science information.
+// NASA Curiosity rover path
+const NASA_CURIOSITY_PATH =
+  "https://trek.nasa.gov/mars/trekarcgis/rest/services/curiosity_path/MapServer/0/query";
 
-const marsBase = L.tileLayer(
-    "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-    {
-        attribution: "&copy; OpenStreetMap contributors"
-    }
-);
+/* ---------- LOCATIONS ---------- */
 
-marsBase.addTo(map);
-
-
-// ---------- SAMPLE ROUTE ----------
-
-let routeLine = null;
-
-
-// Gale Crater / Mount Sharp demonstration route
-
-const routeCoordinates = [
-    [-5.40, 137.80],
-    [-5.39, 137.83],
-    [-5.37, 137.86],
-    [-5.35, 137.89],
-    [-5.33, 137.92],
-    [-5.31, 137.95]
-];
-
-
-// ---------- SCIENCE MARKERS ----------
-
-const scienceMarkers = [];
-
-const scienceLocations = [
-    {
-        lat: -5.40,
-        lon: 137.80,
+const locations = {
+    gale: {
         name: "Gale Crater",
-        description:
-            "Major geological exploration region studied by the Curiosity rover."
+        lat: -5.4,
+        lon: 137.8,
+        zoom: 7
     },
-    {
-        lat: -5.36,
-        lon: 137.87,
-        name: "Layered Terrain",
-        description:
-            "Potential location for investigating sedimentary and geological history."
+
+    jezero: {
+        name: "Jezero Crater",
+        lat: 18.4,
+        lon: 77.6,
+        zoom: 8
     },
-    {
-        lat: -5.33,
-        lon: 137.92,
-        name: "Science Target A",
-        description:
-            "Candidate target for geological investigation."
-    },
-    {
-        lat: -5.31,
-        lon: 137.95,
-        name: "Mount Sharp Approach",
-        description:
-            "Region of interest for studying stratified Martian terrain."
+
+    elysium: {
+        name: "Elysium Planitia",
+        lat: 4.5,
+        lon: 135.9,
+        zoom: 6
     }
-];
+};
 
+/* ---------- MISSION TARGETS ---------- */
 
-scienceLocations.forEach((location) => {
-
-    const marker = L.circleMarker(
-        [location.lat, location.lon],
-        {
-            radius: 6,
-            color: "#e2e5e8",
-            fillColor: "#e2e5e8",
-            fillOpacity: 0.9,
-            weight: 2
-        }
-    );
-
-    marker.bindPopup(`
-        <strong>SCIENCE TARGET</strong><br>
-        ${location.name}<br><br>
-        ${location.description}
-    `);
-
-    marker.addTo(map);
-
-    scienceMarkers.push(marker);
-});
-
-
-// ---------- HAZARD MARKERS ----------
-
-const hazardMarkers = [];
-
-const hazardLocations = [
+const scienceTargets = [
     {
-        lat: -5.38,
-        lon: 137.84,
-        name: "Steep Terrain Zone"
+        name: "Mount Sharp",
+        lat: -5.445,
+        lon: 137.394,
+        type: "Geological science target",
+        mission: "Curiosity / Mars Science Laboratory"
     },
+
     {
-        lat: -5.35,
-        lon: 137.89,
-        name: "Route Hazard Zone"
+        name: "Gale Crater Rim",
+        lat: -5.30,
+        lon: 137.90,
+        type: "Terrain investigation zone",
+        mission: "MRO / MOLA"
     },
+
     {
-        lat: -5.32,
-        lon: 137.93,
-        name: "High-Slope Area"
-    }
-];
-
-
-hazardLocations.forEach((location) => {
-
-    const marker = L.circleMarker(
-        [location.lat, location.lon],
-        {
-            radius: 7,
-            color: "#9ba3ad",
-            fillColor: "#59616b",
-            fillOpacity: 0.9,
-            weight: 2
-        }
-    );
-
-    marker.bindPopup(`
-        <strong>POTENTIAL HAZARD</strong><br>
-        ${location.name}<br>
-        Terrain requires additional evaluation.
-    `);
-
-    marker.addTo(map);
-
-    hazardMarkers.push(marker);
-});
-
-
-// ---------- ROVER / MISSION MARKERS ----------
-
-const roverMarkers = [];
-
-const roverLocations = [
-    {
-        lat: -5.40,
-        lon: 137.80,
-        name: "Curiosity Rover",
-        mission: "Mars Science Laboratory"
+        name: "Jezero Delta",
+        lat: 18.43,
+        lon: 77.58,
+        type: "Ancient delta science target",
+        mission: "Perseverance / Mars 2020"
     },
+
     {
-        lat: 18.44,
-        lon: 77.45,
-        name: "Perseverance Rover",
+        name: "Jezero Crater Floor",
+        lat: 18.39,
+        lon: 77.58,
+        type: "Surface investigation zone",
         mission: "Mars 2020"
     }
 ];
 
+/* ---------- SAMPLE ANALYSIS ZONES ---------- */
+/*
+   These are Vaanora's analysis layer.
+   They are NOT claimed to be NASA hazard classifications.
+*/
 
-roverLocations.forEach((location) => {
+const hazardZones = [
+    {
+        name: "Steep Terrain Zone",
+        lat: -5.33,
+        lon: 137.82,
+        radius: 9000
+    },
 
-    const marker = L.marker(
-        [location.lat, location.lon]
-    );
+    {
+        name: "Rough Terrain Zone",
+        lat: -5.50,
+        lon: 137.65,
+        radius: 6500
+    },
 
-    marker.bindPopup(`
-        <strong>NASA MISSION LOCATION</strong><br>
-        ${location.name}<br>
-        ${location.mission}
-    `);
+    {
+        name: "Route Constraint Zone",
+        lat: 18.45,
+        lon: 77.68,
+        radius: 4500
+    }
+];
 
-    marker.addTo(map);
 
-    roverMarkers.push(marker);
+/* =========================================================
+   MAP INITIALIZATION
+   ========================================================= */
+
+/*
+   NASA Mars Trek uses an equirectangular Mars coordinate
+   system. Leaflet's EPSG:4326 is used here to keep
+   longitude/latitude coordinates aligned with the NASA tiles.
+*/
+
+const map = L.map("map", {
+    crs: L.CRS.EPSG4326,
+    center: [locations.gale.lat, locations.gale.lon],
+    zoom: locations.gale.zoom,
+    minZoom: 2,
+    maxZoom: 10,
+    worldCopyJump: false
 });
 
 
-// ---------- GENERATE ROUTE ----------
+/* ---------- NASA MOLA BASEMAP ---------- */
+
+const molaLayer = L.tileLayer(NASA_MOLA, {
+    tileSize: 256,
+    minZoom: 0,
+    maxZoom: 10,
+    noWrap: true,
+    attribution:
+        "NASA / JPL / MOLA / Mars Trek"
+});
+
+molaLayer.addTo(map);
+
+
+/* ---------- NASA CTX LAYERS ---------- */
+
+const galeCTX = L.tileLayer(NASA_CTX_GALE, {
+    tileSize: 256,
+    minZoom: 0,
+    maxZoom: 10,
+    opacity: 0.75,
+    noWrap: true,
+    attribution:
+        "NASA / JPL / MRO / CTX / Mars Trek"
+});
+
+const jezeroCTX = L.tileLayer(NASA_CTX_JEZERO, {
+    tileSize: 256,
+    minZoom: 0,
+    maxZoom: 10,
+    opacity: 0.75,
+    noWrap: true,
+    attribution:
+        "NASA / JPL / MRO / CTX / Mars Trek"
+});
+
+
+/* =========================================================
+   FEATURE GROUPS
+   ========================================================= */
+
+const scienceLayer = L.layerGroup().addTo(map);
+const hazardLayer = L.layerGroup().addTo(map);
+const missionLayer = L.layerGroup().addTo(map);
+const routeLayer = L.layerGroup().addTo(map);
+
+
+/* =========================================================
+   SCIENCE MARKERS
+   ========================================================= */
+
+function createScienceMarkers() {
+
+    scienceLayer.clearLayers();
+
+    scienceTargets.forEach(target => {
+
+        const marker = L.circleMarker(
+            [target.lat, target.lon],
+            {
+                radius: 7,
+                weight: 2,
+                fillOpacity: 0.85
+            }
+        );
+
+        marker.bindPopup(`
+            <div class="mars-popup">
+                <strong>${target.name}</strong>
+                <br>
+                ${target.type}
+                <br>
+                <small>${target.mission}</small>
+            </div>
+        `);
+
+        marker.addTo(scienceLayer);
+    });
+}
+
+
+/* =========================================================
+   HAZARD / TERRAIN ANALYSIS
+   ========================================================= */
+
+function createHazardMarkers() {
+
+    hazardLayer.clearLayers();
+
+    hazardZones.forEach(zone => {
+
+        const circle = L.circle(
+            [zone.lat, zone.lon],
+            {
+                radius: zone.radius,
+                weight: 1,
+                fillOpacity: 0.12,
+                dashArray: "6 6"
+            }
+        );
+
+        circle.bindPopup(`
+            <div class="mars-popup">
+                <strong>Vaanora Analysis Zone</strong>
+                <br>
+                ${zone.name}
+                <br>
+                <small>
+                Derived analysis layer, not a NASA hazard classification.
+                </small>
+            </div>
+        `);
+
+        circle.addTo(hazardLayer);
+    });
+}
+
+
+/* =========================================================
+   NASA CURIOSITY PATH
+   ========================================================= */
+
+async function loadCuriosityPath() {
+
+    try {
+
+        const url =
+            NASA_CURIOSITY_PATH +
+            "?where=1%3D1" +
+            "&outFields=*" +
+            "&returnGeometry=true" +
+            "&f=geojson";
+
+        const response = await fetch(url);
+
+        if (!response.ok) {
+            throw new Error("NASA Curiosity path request failed");
+        }
+
+        const geojson = await response.json();
+
+        L.geoJSON(geojson, {
+
+            style: {
+                weight: 3,
+                opacity: 0.9,
+                dashArray: "4 5"
+            },
+
+            onEachFeature: function(feature, layer) {
+
+                layer.bindPopup(`
+                    <div class="mars-popup">
+                        <strong>Curiosity Rover Traverse</strong>
+                        <br>
+                        NASA Mars Trek mission data
+                        <br>
+                        <small>
+                        Source: NASA/JPL Curiosity rover path
+                        </small>
+                    </div>
+                `);
+            }
+
+        }).addTo(missionLayer);
+
+    } catch (error) {
+
+        console.warn(
+            "NASA Curiosity path could not be loaded:",
+            error
+        );
+    }
+}
+
+
+/* =========================================================
+   ROVER / MISSION MARKERS
+   ========================================================= */
+
+function addMissionMarkers() {
+
+    const missions = [
+
+        {
+            name: "Curiosity",
+            lat: -5.445,
+            lon: 137.394,
+            description:
+                "NASA Mars Science Laboratory rover"
+        },
+
+        {
+            name: "Perseverance",
+            lat: 18.444,
+            lon: 77.45,
+            description:
+                "NASA Mars 2020 rover"
+        }
+    ];
+
+    missions.forEach(mission => {
+
+        const marker = L.circleMarker(
+            [mission.lat, mission.lon],
+            {
+                radius: 6,
+                weight: 2,
+                fillOpacity: 1
+            }
+        );
+
+        marker.bindPopup(`
+            <div class="mars-popup">
+                <strong>${mission.name}</strong>
+                <br>
+                ${mission.description}
+                <br>
+                <small>NASA mission context</small>
+            </div>
+        `);
+
+        marker.addTo(missionLayer);
+    });
+}
+
+
+/* =========================================================
+   ROUTE GENERATION
+   ========================================================= */
+
+const routeCoordinates = {
+
+    gale: [
+        [-5.43, 137.39],
+        [-5.42, 137.43],
+        [-5.40, 137.48],
+        [-5.37, 137.53],
+        [-5.34, 137.58]
+    ],
+
+    jezero: [
+        [18.43, 77.56],
+        [18.44, 77.60],
+        [18.46, 77.64],
+        [18.48, 77.69],
+        [18.50, 77.73]
+    ],
+
+    elysium: [
+        [4.48, 135.82],
+        [4.50, 135.87],
+        [4.53, 135.92],
+        [4.55, 135.97],
+        [4.58, 136.02]
+    ]
+};
+
+
+/* =========================================================
+   DISTANCE CALCULATION
+   ========================================================= */
+
+function calculateDistance(points) {
+
+    let distance = 0;
+
+    for (let i = 1; i < points.length; i++) {
+
+        distance += map.distance(
+            L.latLng(points[i - 1]),
+            L.latLng(points[i])
+        );
+    }
+
+    return distance / 1000;
+}
+
+
+/* =========================================================
+   UPDATE DASHBOARD STATISTICS
+   ========================================================= */
+
+function updateStat(label, value) {
+
+    const elements =
+        document.querySelectorAll("*");
+
+    for (const element of elements) {
+
+        if (
+            element.children.length === 0 &&
+            element.textContent.trim().toUpperCase() === label
+        ) {
+
+            const parent = element.parentElement;
+
+            if (!parent) continue;
+
+            const candidates =
+                parent.querySelectorAll(
+                    ".stat-value, strong, b"
+                );
+
+            if (candidates.length > 0) {
+
+                candidates[
+                    candidates.length - 1
+                ].textContent = value;
+
+                return;
+            }
+        }
+    }
+}
+
+
+/* =========================================================
+   GENERATE VAANORA ROUTE
+   ========================================================= */
 
 function generateRoute() {
 
-    const start =
-        document.getElementById("startLocation").value;
+    routeLayer.clearLayers();
 
-    const destination =
-        document.getElementById("destination").value;
+    const startSelect =
+        document.querySelector("#startLocation");
+
+    const prioritySelect =
+        document.querySelector("#priority");
+
+    let region = "gale";
+
+    if (startSelect) {
+
+        const value =
+            startSelect.value.toLowerCase();
+
+        if (value.includes("jezero")) {
+            region = "jezero";
+        }
+
+        else if (value.includes("elysium")) {
+            region = "elysium";
+        }
+    }
 
     const priority =
-        document.querySelector(
-            'input[name="priority"]:checked'
-        ).value;
+        prioritySelect
+            ? prioritySelect.value.toLowerCase()
+            : "balanced";
 
+    const points =
+        routeCoordinates[region];
 
-    if (routeLine) {
-        map.removeLayer(routeLine);
-    }
+    const route =
+        L.polyline(points, {
 
-
-    // Draw the demonstration Marswalk route
-
-    routeLine = L.polyline(
-        routeCoordinates,
-        {
-            color: "#e7eaed",
-            weight: 4,
+            weight: 5,
             opacity: 0.95,
-            dashArray: "8 7"
-        }
-    ).addTo(map);
+            dashArray: "10 7"
+
+        }).addTo(routeLayer);
 
 
-    map.fitBounds(routeLine.getBounds(), {
-        padding: [60, 60]
-    });
+    /* ---------- Route distance ---------- */
 
+    const distance =
+        calculateDistance(points);
 
-    // Update values according to mission priority
+    let elevation = 142;
+    let hazards = 2;
+    let scienceStops = 4;
 
-    let distance = "12.4 km";
-    let elevation = "+184 m";
-    let hazards = "3";
-    let scienceStops = "5";
+    if (priority.includes("safety")) {
 
+        elevation = 96;
+        hazards = 1;
+        scienceStops = 3;
+    }
 
-    if (priority === "safety") {
+    else if (priority.includes("science")) {
 
-        distance = "14.1 km";
-        elevation = "+142 m";
-        hazards = "2";
-        scienceStops = "4";
-
-    } else if (priority === "science") {
-
-        distance = "16.8 km";
-        elevation = "+231 m";
-        hazards = "4";
-        scienceStops = "7";
-
-    } else {
-
-        distance = "12.4 km";
-        elevation = "+184 m";
-        hazards = "3";
-        scienceStops = "5";
+        elevation = 188;
+        hazards = 3;
+        scienceStops = 6;
     }
 
 
-    document.getElementById("distance").textContent =
-        distance;
+    updateStat(
+        "DISTANCE",
+        distance.toFixed(1) + " km"
+    );
 
-    document.getElementById("elevation").textContent =
-        elevation;
+    updateStat(
+        "ELEVATION",
+        "+" + elevation + " m"
+    );
 
-    document.getElementById("hazards").textContent =
-        hazards;
+    updateStat(
+        "HAZARDS",
+        hazards
+    );
 
-    document.getElementById("scienceStops").textContent =
-        scienceStops;
-
-
-    document.getElementById("routeTitle").textContent =
-        "Marswalk route generated";
-
-
-    document.getElementById("routeDescription").textContent =
-        "Route balances terrain conditions, potential hazards and scientific targets for the selected mission priority.";
+    updateStat(
+        "SCIENCE STOPS",
+        scienceStops
+    );
 
 
-    document.getElementById("generateBtn").textContent =
-        "ROUTE GENERATED ✓";
+    /* ---------- Zoom to route ---------- */
+
+    map.fitBounds(
+        route.getBounds(),
+        {
+            padding: [30, 30],
+            maxZoom: region === "gale" ? 7 : 8
+        }
+    );
 }
 
 
-// ---------- LAYER CONTROLS ----------
+/* =========================================================
+   SWITCH NASA IMAGERY BASED ON REGION
+   ========================================================= */
 
-function toggleMarkers(type) {
+function updateNASAImagery() {
 
-    let markers;
-
-    if (type === "science") {
-        markers = scienceMarkers;
+    if (map.hasLayer(galeCTX)) {
+        map.removeLayer(galeCTX);
     }
 
-    if (type === "hazard") {
-        markers = hazardMarkers;
+    if (map.hasLayer(jezeroCTX)) {
+        map.removeLayer(jezeroCTX);
     }
 
-    if (type === "rover") {
-        markers = roverMarkers;
+    const startSelect =
+        document.querySelector("#startLocation");
+
+    if (!startSelect) return;
+
+    const value =
+        startSelect.value.toLowerCase();
+
+    if (value.includes("jezero")) {
+
+        jezeroCTX.addTo(map);
     }
 
+    else {
 
-    const checkbox =
-        document.getElementById(
-            type + "Toggle"
+        galeCTX.addTo(map);
+    }
+}
+
+
+/* =========================================================
+   MAP LAYER CONTROLS
+   ========================================================= */
+
+function setupLayerControls() {
+
+    const checkboxes =
+        document.querySelectorAll(
+            'input[type="checkbox"]'
         );
 
-    if (checkbox.checked) {
+    checkboxes.forEach(checkbox => {
 
-        markers.forEach(marker => {
-            marker.addTo(map);
-        });
+        checkbox.addEventListener(
+            "change",
+            function () {
 
-    } else {
+                const text =
+                    this.parentElement.textContent
+                        .trim()
+                        .toLowerCase();
 
-        markers.forEach(marker => {
-            map.removeLayer(marker);
-        });
-    }
+                if (text.includes("terrain")) {
+
+                    if (this.checked) {
+                        if (!map.hasLayer(molaLayer)) {
+                            molaLayer.addTo(map);
+                        }
+                    }
+
+                    else {
+                        map.removeLayer(molaLayer);
+                    }
+                }
+
+
+                else if (
+                    text.includes("science")
+                ) {
+
+                    if (this.checked) {
+                        scienceLayer.addTo(map);
+                    }
+
+                    else {
+                        map.removeLayer(scienceLayer);
+                    }
+                }
+
+
+                else if (
+                    text.includes("hazard")
+                ) {
+
+                    if (this.checked) {
+                        hazardLayer.addTo(map);
+                    }
+
+                    else {
+                        map.removeLayer(hazardLayer);
+                    }
+                }
+
+
+                else if (
+                    text.includes("mission")
+                ) {
+
+                    if (this.checked) {
+                        missionLayer.addTo(map);
+                    }
+
+                    else {
+                        map.removeLayer(missionLayer);
+                    }
+                }
+
+            }
+        );
+    });
 }
 
 
-// ---------- TERRAIN ----------
-
-function toggleLayer(type) {
-
-    const checkbox =
-        document.getElementById("terrainToggle");
-
-    if (checkbox.checked) {
-
-        document.querySelector(
-            ".map-label"
-        ).textContent =
-            "GALE CRATER REGION • TERRAIN LAYER ACTIVE";
-
-    } else {
-
-        document.querySelector(
-            ".map-label"
-        ).textContent =
-            "GALE CRATER REGION • BASE MAP";
-
-    }
-}
-
-
-// ---------- MAP COORDINATES ----------
+/* =========================================================
+   COORDINATE DISPLAY
+   ========================================================= */
 
 map.on("mousemove", function(e) {
 
-    document.getElementById("latValue").textContent =
-        e.latlng.lat.toFixed(2) + "°";
+    const lat =
+        e.latlng.lat.toFixed(2);
 
-    document.getElementById("lonValue").textContent =
-        e.latlng.lng.toFixed(2) + "°";
+    const lon =
+        e.latlng.lng.toFixed(2);
 
+    const coordinateElements =
+        document.querySelectorAll(
+            ".coordinates, #coordinates, .map-coordinates"
+        );
+
+    coordinateElements.forEach(element => {
+
+        element.textContent =
+            `LAT ${lat}°  LON ${lon}°`;
+
+    });
 });
 
 
-// ---------- INITIAL ROUTE ----------
+/* =========================================================
+   GENERATE BUTTON
+   ========================================================= */
+
+function setupGenerateButton() {
+
+    const buttons =
+        document.querySelectorAll("button");
+
+    buttons.forEach(button => {
+
+        if (
+            button.textContent
+                .toLowerCase()
+                .includes("generate")
+        ) {
+
+            button.addEventListener(
+                "click",
+                function () {
+
+                    updateNASAImagery();
+                    generateRoute();
+
+                }
+            );
+        }
+    });
+}
+
+
+/* =========================================================
+   START LOCATION CHANGES
+   ========================================================= */
+
+function setupLocationChanges() {
+
+    const startSelect =
+        document.querySelector("#startLocation");
+
+    if (!startSelect) return;
+
+    startSelect.addEventListener(
+        "change",
+        function () {
+
+            updateNASAImagery();
+            generateRoute();
+
+        }
+    );
+}
+
+
+/* =========================================================
+   INITIALIZE
+   ========================================================= */
+
+createScienceMarkers();
+
+createHazardMarkers();
+
+addMissionMarkers();
+
+loadCuriosityPath();
+
+setupLayerControls();
+
+setupGenerateButton();
+
+setupLocationChanges();
+
+updateNASAImagery();
 
 generateRoute();
+
+
+console.log(
+    "VAANORA initialized with NASA Mars Trek data."
+);

@@ -1,246 +1,1688 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Vaanora | Martian Surface Intelligence</title>
+<title>Vaanora | Marswalk Planner</title>
 
-    <link rel="stylesheet"
-          href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-          integrity="sha256-p4NxAoJBhIINfQ3hT4J6s4sY8M4m8vH0YqT8x1yQ4k="
-          crossorigin=""/>
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+/>
 
-    <link rel="stylesheet" href="style.css">
+<style>
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: Arial, Helvetica, sans-serif;
+  background: #090d14;
+  color: #ffffff;
+}
+
+.app {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+}
+
+/* SIDEBAR */
+
+.sidebar {
+  width: 360px;
+  min-width: 360px;
+  height: 100vh;
+  background: #0d131d;
+  border-right: 1px solid #263242;
+  overflow-y: auto;
+  z-index: 1000;
+}
+
+.logo {
+  padding: 24px 24px 16px;
+  border-bottom: 1px solid #263242;
+}
+
+.logo h1 {
+  margin: 0;
+  font-size: 28px;
+  letter-spacing: 3px;
+}
+
+.logo p {
+  margin: 6px 0 0;
+  color: #8e9bab;
+  font-size: 12px;
+}
+
+.section {
+  padding: 18px 20px;
+  border-bottom: 1px solid #202b39;
+}
+
+.section-title {
+  font-size: 11px;
+  color: #7f8c9c;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 12px;
+}
+
+label {
+  display: block;
+  color: #aab5c3;
+  font-size: 12px;
+  margin: 12px 0 6px;
+}
+
+select,
+button {
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid #344154;
+  background: #151d29;
+  color: white;
+  padding: 11px 12px;
+  font-size: 13px;
+}
+
+select {
+  cursor: pointer;
+}
+
+.priority-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.priority-btn {
+  cursor: pointer;
+  font-size: 11px;
+  padding: 10px 5px;
+}
+
+.priority-btn.active {
+  background: #e85b3f;
+  border-color: #e85b3f;
+}
+
+.generate {
+  margin-top: 15px;
+  background: #e85b3f;
+  border-color: #e85b3f;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.generate:hover {
+  background: #f16b4f;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.info-card {
+  background: #131c28;
+  border: 1px solid #293646;
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.info-card span {
+  display: block;
+  font-size: 10px;
+  color: #7f8c9c;
+  margin-bottom: 5px;
+  text-transform: uppercase;
+}
+
+.info-card strong {
+  font-size: 15px;
+}
+
+.source {
+  font-size: 11px;
+  color: #7f8c9c;
+  line-height: 1.5;
+}
+
+.source a {
+  color: #8dc8ff;
+}
+
+/* MAIN */
+
+.main {
+  flex: 1;
+  height: 100vh;
+  position: relative;
+  min-width: 0;
+}
+
+.topbar {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  right: 16px;
+  z-index: 900;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  pointer-events: none;
+}
+
+.badge {
+  pointer-events: auto;
+  background: rgba(10, 16, 25, 0.92);
+  border: 1px solid #344154;
+  border-radius: 8px;
+  padding: 9px 13px;
+  font-size: 12px;
+  backdrop-filter: blur(8px);
+}
+
+.status {
+  color: #73d49b;
+}
+
+#map {
+  width: 100%;
+  height: 100%;
+  background: #111822;
+}
+
+/* LEAFLET */
+
+.leaflet-container {
+  background: #111822;
+}
+
+.leaflet-control-zoom a {
+  background: #111923 !important;
+  color: white !important;
+  border-color: #334153 !important;
+}
+
+.leaflet-control-layers {
+  background: rgba(12, 18, 27, 0.95) !important;
+  color: white !important;
+  border: 1px solid #334153 !important;
+}
+
+.leaflet-control-layers label {
+  color: white;
+}
+
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+  background: #111923;
+  color: white;
+}
+
+.leaflet-popup-content {
+  font-size: 12px;
+}
+
+.popup-title {
+  font-weight: bold;
+  font-size: 14px;
+  margin-bottom: 5px;
+}
+
+.popup-type {
+  color: #f08a70;
+  font-size: 10px;
+  text-transform: uppercase;
+}
+
+/* MAP LEGEND */
+
+.legend {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  z-index: 800;
+  background: rgba(10, 16, 25, 0.93);
+  border: 1px solid #344154;
+  border-radius: 9px;
+  padding: 13px;
+  min-width: 170px;
+  font-size: 11px;
+}
+
+.legend-title {
+  color: #9da9b8;
+  margin-bottom: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 10px;
+}
+
+.legend-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 7px 0;
+}
+
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.dot-science {
+  background: #ffd166;
+}
+
+.dot-mission {
+  background: #5cb8ff;
+}
+
+.dot-hazard {
+  background: #ef5b5b;
+}
+
+.dot-start {
+  background: #65d48a;
+}
+
+.dot-end {
+  background: #ffffff;
+}
+
+/* ANALYSIS */
+
+.analysis {
+  margin-top: 14px;
+  padding: 13px;
+  border-radius: 8px;
+  background: #111923;
+  border: 1px solid #293646;
+}
+
+.analysis h3 {
+  margin: 0 0 10px;
+  font-size: 12px;
+}
+
+.analysis-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 0;
+  border-bottom: 1px solid #202a37;
+  font-size: 11px;
+}
+
+.analysis-row:last-child {
+  border-bottom: 0;
+}
+
+.analysis-row span {
+  color: #7f8c9c;
+}
+
+/* MOBILE */
+
+@media (max-width: 850px) {
+  .sidebar {
+    width: 300px;
+    min-width: 300px;
+  }
+}
+
+@media (max-width: 650px) {
+  .app {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    min-width: 0;
+    height: 42vh;
+  }
+
+  .main {
+    height: 58vh;
+  }
+
+  .legend {
+    display: none;
+  }
+}
+</style>
 </head>
 
 <body>
 
 <div class="app">
 
-    <!-- SIDEBAR -->
-    <aside class="sidebar">
+  <!-- LEFT SIDEBAR -->
+  <aside class="sidebar">
 
-        <div class="brand">
-            <div class="logo">V</div>
-            <div>
-                <h1>VAANORA</h1>
-                <span>MARTIAN SURFACE INTELLIGENCE</span>
-            </div>
+    <div class="logo">
+      <h1>VAANORA</h1>
+      <p>MARTIAN SURFACE INTELLIGENCE</p>
+    </div>
+
+    <div class="section">
+
+      <div class="section-title">
+        Mission Planner
+      </div>
+
+      <label for="region">Mars Region</label>
+
+      <select id="region">
+        <option value="gale">Gale Crater</option>
+        <option value="jezero">Jezero Crater</option>
+        <option value="elysium">Elysium Planitia</option>
+      </select>
+
+      <label for="destination">
+        Destination
+      </label>
+
+      <select id="destination">
+        <option value="mount-sharp">
+          Mount Sharp Region
+        </option>
+        <option value="gale-rim">
+          Gale Crater Rim
+        </option>
+        <option value="jezero-delta">
+          Jezero Delta
+        </option>
+        <option value="jezero-floor">
+          Jezero Crater Floor
+        </option>
+      </select>
+
+      <label>
+        Mission Priority
+      </label>
+
+      <div class="priority-grid">
+
+        <button
+          class="priority-btn"
+          data-priority="safety"
+        >
+          Safety
+        </button>
+
+        <button
+          class="priority-btn"
+          data-priority="science"
+        >
+          Science
+        </button>
+
+        <button
+          class="priority-btn active"
+          data-priority="balanced"
+        >
+          Balanced
+        </button>
+
+      </div>
+
+      <button
+        id="generate"
+        class="generate"
+      >
+        GENERATE MARSWALK
+      </button>
+
+    </div>
+
+    <div class="section">
+
+      <div class="section-title">
+        Route Analysis
+      </div>
+
+      <div class="info-grid">
+
+        <div class="info-card">
+          <span>Distance</span>
+          <strong id="distance">0 km</strong>
         </div>
 
-        <div class="mission-badge">
-            NASA SPACE APPS 2026
+        <div class="info-card">
+          <span>Priority</span>
+          <strong id="priorityText">Balanced</strong>
         </div>
 
-        <section class="panel-section">
-
-            <h3>MISSION PLANNER</h3>
-
-            <label>START LOCATION</label>
-
-            <select id="startLocation">
-                <option value="gale">Gale Crater</option>
-                <option value="jezero">Jezero Crater</option>
-                <option value="elysium">Elysium Planitia</option>
-            </select>
-
-            <label>DESTINATION</label>
-
-            <select id="destination">
-                <option value="mountsharp">Mount Sharp</option>
-                <option value="delta">Jezero Delta</option>
-                <option value="elysium">Elysium Region</option>
-            </select>
-
-            <label>MISSION PRIORITY</label>
-
-            <div class="priority-options">
-
-                <label class="radio">
-                    <input type="radio" name="priority" value="safety" checked>
-                    <span>Safety</span>
-                </label>
-
-                <label class="radio">
-                    <input type="radio" name="priority" value="science">
-                    <span>Science</span>
-                </label>
-
-                <label class="radio">
-                    <input type="radio" name="priority" value="balanced">
-                    <span>Balanced</span>
-                </label>
-
-            </div>
-
-            <button id="generateBtn" onclick="generateRoute()">
-                GENERATE MARSWALK
-            </button>
-
-        </section>
-
-
-        <section class="panel-section">
-
-            <h3>MAP LAYERS</h3>
-
-            <label class="layer">
-                <input type="checkbox" id="terrainToggle" checked
-                       onchange="toggleLayer('terrain')">
-                <span>Terrain</span>
-                <small>MOLA</small>
-            </label>
-
-            <label class="layer">
-                <input type="checkbox" id="scienceToggle" checked
-                       onchange="toggleMarkers('science')">
-                <span>Science Targets</span>
-                <small>NASA</small>
-            </label>
-
-            <label class="layer">
-                <input type="checkbox" id="hazardToggle" checked
-                       onchange="toggleMarkers('hazard')">
-                <span>Potential Hazards</span>
-                <small>Analysis</small>
-            </label>
-
-            <label class="layer">
-                <input type="checkbox" id="roverToggle" checked
-                       onchange="toggleMarkers('rover')">
-                <span>Mission Locations</span>
-                <small>NASA</small>
-            </label>
-
-        </section>
-
-
-        <section class="panel-section">
-
-            <h3>NASA DATA SOURCES</h3>
-
-            <div class="data-source">
-                <strong>MOLA</strong>
-                <span>Mars topography</span>
-            </div>
-
-            <div class="data-source">
-                <strong>MRO / HiRISE</strong>
-                <span>Surface imagery</span>
-            </div>
-
-            <div class="data-source">
-                <strong>NASA Mars Missions</strong>
-                <span>Science context</span>
-            </div>
-
-        </section>
-
-
-        <div class="footer">
-            <span>Vaanora © 2026</span>
-            <span>NASA Space Apps Challenge</span>
+        <div class="info-card">
+          <span>Science Stops</span>
+          <strong id="scienceStops">0</strong>
         </div>
 
-    </aside>
-
-
-    <!-- MAIN -->
-    <main class="main">
-
-        <header class="topbar">
-
-            <div>
-                <span class="eyebrow">INTERPLANETARY SURVIVAL GUIDE</span>
-                <h2>MARTIAN MAP</h2>
-            </div>
-
-            <div class="status">
-                <span class="status-dot"></span>
-                MISSION PLANNING MODE
-            </div>
-
-        </header>
-
-
-        <!-- MAP -->
-        <div id="map"></div>
-
-
-        <!-- MAP INFO -->
-        <div class="map-overlay">
-
-            <div class="coordinates">
-                <span>LAT</span>
-                <strong id="latValue">-5.40°</strong>
-
-                <span>LON</span>
-                <strong id="lonValue">137.80°</strong>
-            </div>
-
-            <div class="map-label">
-                GALE CRATER REGION
-            </div>
-
+        <div class="info-card">
+          <span>Analysis Zones</span>
+          <strong id="hazards">0</strong>
         </div>
 
+      </div>
 
-        <!-- BOTTOM PANEL -->
-        <div class="bottom-panel">
+      <div class="analysis">
 
-            <div class="route-status">
+        <h3>Traverse Summary</h3>
 
-                <div class="status-icon">✓</div>
-
-                <div>
-                    <span class="eyebrow">ROUTE ANALYSIS</span>
-                    <h3 id="routeTitle">Marswalk route ready</h3>
-                    <p id="routeDescription">
-                        Select mission parameters and generate a route.
-                    </p>
-                </div>
-
-            </div>
-
-
-            <div class="stats">
-
-                <div class="stat">
-                    <span>DISTANCE</span>
-                    <strong id="distance">12.4 km</strong>
-                </div>
-
-                <div class="stat">
-                    <span>ELEVATION</span>
-                    <strong id="elevation">+184 m</strong>
-                </div>
-
-                <div class="stat">
-                    <span>HAZARDS</span>
-                    <strong id="hazards">3</strong>
-                </div>
-
-                <div class="stat">
-                    <span>SCIENCE STOPS</span>
-                    <strong id="scienceStops">5</strong>
-                </div>
-
-            </div>
-
+        <div class="analysis-row">
+          <span>Start</span>
+          <strong id="startName">
+            Gale Crater
+          </strong>
         </div>
 
-    </main>
+        <div class="analysis-row">
+          <span>Destination</span>
+          <strong id="endName">
+            Mount Sharp
+          </strong>
+        </div>
+
+        <div class="analysis-row">
+          <span>Terrain</span>
+          <strong>NASA MOLA</strong>
+        </div>
+
+        <div class="analysis-row">
+          <span>Mission Data</span>
+          <strong>NASA Curiosity</strong>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="section">
+
+      <div class="section-title">
+        Data Sources
+      </div>
+
+      <div class="source">
+
+        <b>NASA MOLA</b><br>
+        Mars Global Surveyor / Mars Orbiter Laser Altimeter
+
+        <br><br>
+
+        <b>NASA Mars Trek</b><br>
+        Planetary mapping and mission data services
+
+        <br><br>
+
+        <b>Curiosity Rover</b><br>
+        NASA rover traverse information
+
+        <br><br>
+
+        <a
+          href="https://trek.nasa.gov/mars/"
+          target="_blank"
+        >
+          Open NASA Mars Trek
+        </a>
+
+      </div>
+
+    </div>
+
+  </aside>
+
+
+  <!-- MAIN MAP -->
+  <main class="main">
+
+    <div class="topbar">
+
+      <div class="badge">
+        <span class="status">● LIVE</span>
+        &nbsp; MARS SURFACE MAP
+      </div>
+
+      <div class="badge">
+        LAT <span id="lat">--</span>
+        &nbsp;&nbsp;
+        LON <span id="lon">--</span>
+      </div>
+
+    </div>
+
+    <div id="map"></div>
+
+    <div class="legend">
+
+      <div class="legend-title">
+        Map Layers
+      </div>
+
+      <div class="legend-row">
+        <span class="legend-dot dot-science"></span>
+        Science Target
+      </div>
+
+      <div class="legend-row">
+        <span class="legend-dot dot-mission"></span>
+        Mission
+      </div>
+
+      <div class="legend-row">
+        <span class="legend-dot dot-hazard"></span>
+        Analysis Zone
+      </div>
+
+      <div class="legend-row">
+        <span class="legend-dot dot-start"></span>
+        Start
+      </div>
+
+      <div class="legend-row">
+        <span class="legend-dot dot-end"></span>
+        Destination
+      </div>
+
+    </div>
+
+  </main>
 
 </div>
 
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-        crossorigin="">
-</script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-<script src="script.js"></script>
+<script>
+
+/*
+========================================================
+VAANORA
+MARSWALK PLANNER
+
+NASA MOLA GLOBAL CYLINDRICAL MAP
+========================================================
+*/
+
+/*
+NASA MOLA cylindrical global map.
+
+NASA archive:
+https://marsoweb.nas.nasa.gov/globalData/datamaps.html
+
+Image:
+5760 × 2880 pixels
+Longitude: -180 → +180
+Latitude: +90 → -90
+*/
+
+const NASA_MOLA_IMAGE =
+  "https://marsoweb.nas.nasa.gov/globalData/images/fullscale/MOLA_cylin.jpg";
+
+
+/*
+========================================================
+MARS LOCATIONS
+========================================================
+*/
+
+const LOCATIONS = {
+
+  gale: {
+    name: "Gale Crater",
+    lat: -5.40,
+    lon: 137.80
+  },
+
+  jezero: {
+    name: "Jezero Crater",
+    lat: 18.40,
+    lon: 77.60
+  },
+
+  elysium: {
+    name: "Elysium Planitia",
+    lat: 4.50,
+    lon: 135.90
+  },
+
+  mountSharp: {
+    name: "Mount Sharp",
+    lat: -5.10,
+    lon: 137.85
+  },
+
+  galeRim: {
+    name: "Gale Crater Rim",
+    lat: -4.60,
+    lon: 137.40
+  },
+
+  jezeroDelta: {
+    name: "Jezero Delta",
+    lat: 18.44,
+    lon: 77.58
+  },
+
+  jezeroFloor: {
+    name: "Jezero Crater Floor",
+    lat: 18.30,
+    lon: 77.50
+  }
+
+};
+
+
+/*
+========================================================
+IMAGE COORDINATE CONVERSION
+========================================================
+
+The NASA image is:
+
+width  = 5760
+height = 2880
+
+Longitude:
+-180 → x 0
++180 → x 5760
+
+Latitude:
++90 → y 0
+-90 → y 2880
+*/
+
+const IMAGE_WIDTH = 5760;
+const IMAGE_HEIGHT = 2880;
+
+
+function marsToImage(lat, lon) {
+
+  const x =
+    ((lon + 180) / 360) *
+    IMAGE_WIDTH;
+
+  const y =
+    ((90 - lat) / 180) *
+    IMAGE_HEIGHT;
+
+  return [y, x];
+}
+
+
+function imageToMars(y, x) {
+
+  const lon =
+    (x / IMAGE_WIDTH) * 360 - 180;
+
+  const lat =
+    90 - (y / IMAGE_HEIGHT) * 180;
+
+  return {
+    lat,
+    lon
+  };
+
+}
+
+
+/*
+========================================================
+MAP
+========================================================
+*/
+
+const map = L.map("map", {
+
+  crs: L.CRS.Simple,
+
+  minZoom: -2,
+
+  maxZoom: 3,
+
+  zoomControl: true,
+
+  attributionControl: true
+
+});
+
+
+/*
+NASA IMAGE BOUNDS
+*/
+
+const imageBounds = [
+
+  [0, 0],
+
+  [IMAGE_HEIGHT, IMAGE_WIDTH]
+
+];
+
+
+const molaLayer =
+  L.imageOverlay(
+    NASA_MOLA_IMAGE,
+    imageBounds,
+    {
+      opacity: 1,
+      interactive: false
+    }
+  ).addTo(map);
+
+
+map.fitBounds(imageBounds);
+
+
+/*
+NASA ATTRIBUTION
+*/
+
+map.attributionControl.addAttribution(
+  "NASA / JPL / USGS MOLA"
+);
+
+
+/*
+========================================================
+LAYER GROUPS
+========================================================
+*/
+
+const scienceLayer =
+  L.layerGroup().addTo(map);
+
+const missionLayer =
+  L.layerGroup().addTo(map);
+
+const analysisLayer =
+  L.layerGroup().addTo(map);
+
+const routeLayer =
+  L.layerGroup().addTo(map);
+
+
+/*
+========================================================
+HELPERS
+========================================================
+*/
+
+function createMarker(
+  location,
+  title,
+  type,
+  layer,
+  color
+) {
+
+  const point =
+    marsToImage(
+      location.lat,
+      location.lon
+    );
+
+  const marker =
+    L.circleMarker(point, {
+
+      radius: 7,
+
+      color: color,
+
+      fillColor: color,
+
+      fillOpacity: 0.9,
+
+      weight: 2
+
+    });
+
+  marker.bindPopup(
+    `
+      <div class="popup-title">
+        ${title}
+      </div>
+
+      <div class="popup-type">
+        ${type}
+      </div>
+
+      <br>
+
+      Latitude:
+      ${location.lat.toFixed(2)}°
+
+      <br>
+
+      Longitude:
+      ${location.lon.toFixed(2)}°
+    `
+  );
+
+  marker.addTo(layer);
+
+  return marker;
+
+}
+
+
+/*
+========================================================
+SCIENCE LOCATIONS
+========================================================
+*/
+
+createMarker(
+
+  LOCATIONS.mountSharp,
+
+  "Mount Sharp",
+
+  "SCIENCE TARGET",
+
+  scienceLayer,
+
+  "#ffd166"
+
+);
+
+createMarker(
+
+  LOCATIONS.galeRim,
+
+  "Gale Crater Rim",
+
+  "SCIENCE TARGET",
+
+  scienceLayer,
+
+  "#ffd166"
+
+);
+
+createMarker(
+
+  LOCATIONS.jezeroDelta,
+
+  "Jezero Delta",
+
+  "SCIENCE TARGET",
+
+  scienceLayer,
+
+  "#ffd166"
+
+);
+
+createMarker(
+
+  LOCATIONS.jezeroFloor,
+
+  "Jezero Crater Floor",
+
+  "SCIENCE TARGET",
+
+  scienceLayer,
+
+  "#ffd166"
+
+);
+
+
+/*
+========================================================
+MISSION LOCATIONS
+========================================================
+*/
+
+createMarker(
+
+  LOCATIONS.gale,
+
+  "Curiosity Rover Region",
+
+  "NASA MISSION",
+
+  missionLayer,
+
+  "#5cb8ff"
+
+);
+
+createMarker(
+
+  LOCATIONS.jezero,
+
+  "Perseverance Rover Region",
+
+  "NASA MISSION",
+
+  missionLayer,
+
+  "#5cb8ff"
+
+);
+
+
+/*
+========================================================
+ANALYSIS ZONES
+
+IMPORTANT:
+These are Vaanora analysis zones,
+NOT official NASA hazard classifications.
+========================================================
+*/
+
+const analysisZones = [
+
+  {
+    name: "Gale Terrain Analysis Zone",
+    lat: -5.0,
+    lon: 137.65,
+    radius: 1.0
+  },
+
+  {
+    name: "Mount Sharp Terrain Analysis Zone",
+    lat: -5.15,
+    lon: 137.88,
+    radius: 0.45
+  },
+
+  {
+    name: "Jezero Delta Analysis Zone",
+    lat: 18.43,
+    lon: 77.58,
+    radius: 0.5
+  }
+
+];
+
+
+analysisZones.forEach(zone => {
+
+  const center =
+    marsToImage(
+      zone.lat,
+      zone.lon
+    );
+
+  const radius =
+    zone.radius *
+    IMAGE_HEIGHT /
+    180;
+
+  const circle =
+    L.circle(
+      center,
+      {
+        radius: radius,
+
+        color: "#ef5b5b",
+
+        fillColor: "#ef5b5b",
+
+        fillOpacity: 0.12,
+
+        weight: 2,
+
+        dashArray: "6 5"
+      }
+    );
+
+  circle.bindPopup(
+    `
+      <div class="popup-title">
+        ${zone.name}
+      </div>
+
+      <div class="popup-type">
+        VAANORA ANALYSIS ZONE
+      </div>
+
+      <br>
+
+      Potential terrain-analysis region.
+      This is not an official NASA hazard classification.
+    `
+  );
+
+  circle.addTo(analysisLayer);
+
+});
+
+
+/*
+========================================================
+CURIOUSITY ROVER SAMPLE TRAVERSE
+
+Representative route near Gale Crater.
+
+NASA rover path service is available from
+NASA Mars Trek.
+
+The visible route below is kept simple for
+stable demonstration behaviour.
+========================================================
+*/
+
+const curiosityPath = [
+
+  [-5.40, 137.80],
+
+  [-5.39, 137.81],
+
+  [-5.37, 137.82],
+
+  [-5.34, 137.83],
+
+  [-5.30, 137.84],
+
+  [-5.25, 137.85],
+
+  [-5.20, 137.85],
+
+  [-5.15, 137.85],
+
+  [-5.10, 137.85]
+
+];
+
+
+const curiosityLine =
+  curiosityPath.map(
+    point =>
+      marsToImage(
+        point[0],
+        point[1]
+      )
+  );
+
+
+L.polyline(
+  curiosityLine,
+  {
+    color: "#5cb8ff",
+
+    weight: 2,
+
+    opacity: 0.75,
+
+    dashArray: "4 6"
+  }
+)
+.bindPopup(
+  `
+    <div class="popup-title">
+      Curiosity Traverse
+    </div>
+
+    <div class="popup-type">
+      NASA MISSION CONTEXT
+    </div>
+
+    <br>
+
+    Curiosity rover traverse shown
+    in the Gale Crater region.
+  `
+)
+.addTo(missionLayer);
+
+
+/*
+========================================================
+ROUTE
+========================================================
+*/
+
+let routeStart =
+  LOCATIONS.gale;
+
+let routeEnd =
+  LOCATIONS.mountSharp;
+
+let currentPriority =
+  "balanced";
+
+
+function distanceKm(
+  lat1,
+  lon1,
+  lat2,
+  lon2
+) {
+
+  const R = 3389.5;
+
+  const dLat =
+    (lat2 - lat1) *
+    Math.PI / 180;
+
+  const dLon =
+    (lon2 - lon1) *
+    Math.PI / 180;
+
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+
+    Math.cos(lat1 * Math.PI / 180) *
+
+    Math.cos(lat2 * Math.PI / 180) *
+
+    Math.sin(dLon / 2) ** 2;
+
+  const c =
+    2 *
+    Math.atan2(
+      Math.sqrt(a),
+      Math.sqrt(1 - a)
+    );
+
+  return R * c;
+
+}
+
+
+function generateRoute() {
+
+  routeLayer.clearLayers();
+
+
+  /*
+  Route changes slightly according to priority.
+  This is a demonstration planning route,
+  not an autonomous mission-certified path.
+  */
+
+  let route;
+
+  if (currentPriority === "safety") {
+
+    route = [
+
+      routeStart,
+
+      {
+        lat: -5.35,
+        lon: 137.78
+      },
+
+      {
+        lat: -5.25,
+        lon: 137.82
+      },
+
+      {
+        lat: -5.17,
+        lon: 137.84
+      },
+
+      routeEnd
+
+    ];
+
+  } else if (currentPriority === "science") {
+
+    route = [
+
+      routeStart,
+
+      LOCATIONS.galeRim,
+
+      {
+        lat: -5.20,
+        lon: 137.82
+      },
+
+      LOCATIONS.mountSharp,
+
+      routeEnd
+
+    ];
+
+  } else {
+
+    route = [
+
+      routeStart,
+
+      {
+        lat: -5.35,
+        lon: 137.79
+      },
+
+      LOCATIONS.galeRim,
+
+      {
+        lat: -5.20,
+        lon: 137.83
+      },
+
+      routeEnd
+
+    ];
+
+  }
+
+
+  const routePoints =
+    route.map(
+      p =>
+        marsToImage(
+          p.lat,
+          p.lon
+        )
+    );
+
+
+  L.polyline(
+    routePoints,
+    {
+
+      color: "#ffffff",
+
+      weight: 5,
+
+      opacity: 0.95
+
+    }
+  )
+  .addTo(routeLayer);
+
+
+  /*
+  Start marker
+  */
+
+  const startPoint =
+    marsToImage(
+      routeStart.lat,
+      routeStart.lon
+    );
+
+
+  L.circleMarker(
+    startPoint,
+    {
+
+      radius: 9,
+
+      color: "#65d48a",
+
+      fillColor: "#65d48a",
+
+      fillOpacity: 1,
+
+      weight: 3
+
+    }
+  )
+  .bindPopup(
+    `
+      <div class="popup-title">
+        START
+      </div>
+
+      ${routeStart.name}
+    `
+  )
+  .addTo(routeLayer);
+
+
+  /*
+  Destination marker
+  */
+
+  const endPoint =
+    marsToImage(
+      routeEnd.lat,
+      routeEnd.lon
+    );
+
+
+  L.circleMarker(
+    endPoint,
+    {
+
+      radius: 9,
+
+      color: "#ffffff",
+
+      fillColor: "#ffffff",
+
+      fillOpacity: 1,
+
+      weight: 3
+
+    }
+  )
+  .bindPopup(
+    `
+      <div class="popup-title">
+        DESTINATION
+      </div>
+
+      ${routeEnd.name}
+    `
+  )
+  .addTo(routeLayer);
+
+
+  /*
+  Distance
+  */
+
+  let totalDistance = 0;
+
+  for (
+    let i = 1;
+    i < route.length;
+    i++
+  ) {
+
+    totalDistance +=
+      distanceKm(
+
+        route[i - 1].lat,
+
+        route[i - 1].lon,
+
+        route[i].lat,
+
+        route[i].lon
+
+      );
+
+  }
+
+
+  document.getElementById(
+    "distance"
+  ).textContent =
+    totalDistance.toFixed(1) + " km";
+
+
+  document.getElementById(
+    "priorityText"
+  ).textContent =
+    currentPriority.charAt(0).toUpperCase() +
+    currentPriority.slice(1);
+
+
+  document.getElementById(
+    "scienceStops"
+  ).textContent =
+    currentPriority === "science"
+      ? "3"
+      : currentPriority === "balanced"
+        ? "2"
+        : "1";
+
+
+  document.getElementById(
+    "hazards"
+  ).textContent =
+    currentPriority === "safety"
+      ? "1"
+      : currentPriority === "balanced"
+        ? "2"
+        : "3";
+
+
+  document.getElementById(
+    "startName"
+  ).textContent =
+    routeStart.name;
+
+
+  document.getElementById(
+    "endName"
+  ).textContent =
+    routeEnd.name;
+
+
+  /*
+  Zoom to route
+  */
+
+  map.fitBounds(
+    L.latLngBounds(
+      routePoints
+    ),
+    {
+      padding: [80, 80]
+    }
+  );
+
+}
+
+
+/*
+========================================================
+PRIORITY BUTTONS
+========================================================
+*/
+
+document
+  .querySelectorAll(".priority-btn")
+  .forEach(button => {
+
+    button.addEventListener(
+      "click",
+      () => {
+
+        document
+          .querySelectorAll(
+            ".priority-btn"
+          )
+          .forEach(
+            b =>
+              b.classList.remove(
+                "active"
+              )
+          );
+
+        button.classList.add(
+          "active"
+        );
+
+        currentPriority =
+          button.dataset.priority;
+
+      }
+    );
+
+  });
+
+
+/*
+========================================================
+REGION CHANGE
+========================================================
+*/
+
+document
+  .getElementById("region")
+  .addEventListener(
+    "change",
+    event => {
+
+      const value =
+        event.target.value;
+
+      routeStart =
+        LOCATIONS[value];
+
+      /*
+      Automatically choose sensible
+      destination.
+      */
+
+      if (value === "jezero") {
+
+        routeEnd =
+          LOCATIONS.jezeroDelta;
+
+        document.getElementById(
+          "destination"
+        ).value =
+          "jezero-delta";
+
+      } else if (
+        value === "elysium"
+      ) {
+
+        routeEnd = {
+          name: "Elysium Planitia",
+          lat: 4.50,
+          lon: 135.90
+        };
+
+      } else {
+
+        routeEnd =
+          LOCATIONS.mountSharp;
+
+        document.getElementById(
+          "destination"
+        ).value =
+          "mount-sharp";
+
+      }
+
+      generateRoute();
+
+    }
+  );
+
+
+/*
+========================================================
+DESTINATION CHANGE
+========================================================
+*/
+
+document
+  .getElementById("destination")
+  .addEventListener(
+    "change",
+    event => {
+
+      const value =
+        event.target.value;
+
+      if (
+        value === "mount-sharp"
+      ) {
+
+        routeEnd =
+          LOCATIONS.mountSharp;
+
+      }
+
+      if (
+        value === "gale-rim"
+      ) {
+
+        routeEnd =
+          LOCATIONS.galeRim;
+
+      }
+
+      if (
+        value === "jezero-delta"
+      ) {
+
+        routeEnd =
+          LOCATIONS.jezeroDelta;
+
+      }
+
+      if (
+        value === "jezero-floor"
+      ) {
+
+        routeEnd =
+          LOCATIONS.jezeroFloor;
+
+      }
+
+      generateRoute();
+
+    }
+  );
+
+
+/*
+========================================================
+GENERATE BUTTON
+========================================================
+*/
+
+document
+  .getElementById("generate")
+  .addEventListener(
+    "click",
+    generateRoute
+  );
+
+
+/*
+========================================================
+MAP MOUSE COORDINATES
+========================================================
+*/
+
+map.on(
+  "mousemove",
+  event => {
+
+    const coords =
+      imageToMars(
+        event.latlng.lat,
+        event.latlng.lng
+      );
+
+    document.getElementById(
+      "lat"
+    ).textContent =
+      coords.lat.toFixed(2) + "°";
+
+    document.getElementById(
+      "lon"
+    ).textContent =
+      coords.lon.toFixed(2) + "°";
+
+  }
+);
+
+
+/*
+========================================================
+INITIAL ROUTE
+========================================================
+*/
+
+generateRoute();
+
+</script>
 
 </body>
 </html>

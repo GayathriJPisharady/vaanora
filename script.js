@@ -467,9 +467,8 @@ function generateRoute() {
     const startSelect =
         document.querySelector("#startLocation");
 
-    const prioritySelect =
-        document.querySelector("#priority");
-
+    const priority =
+        currentPriority;
     let region = "gale";
 
     if (startSelect) {
@@ -485,11 +484,56 @@ function generateRoute() {
             region = "elysium";
         }
     }
+let currentPriority = "balanced";
 
-    const priority =
-        prioritySelect
-            ? prioritySelect.value.toLowerCase()
-            : "balanced";
+function setupPriorityButtons() {
+
+    const buttons = document.querySelectorAll("button");
+
+    buttons.forEach(button => {
+
+        const text =
+            button.textContent.trim().toLowerCase();
+
+        if (
+            text === "safety" ||
+            text === "science" ||
+            text === "balanced"
+        ) {
+
+            button.addEventListener("click", function () {
+
+                currentPriority = text;
+
+                // Remove active state
+                buttons.forEach(btn => {
+
+                    const btnText =
+                        btn.textContent.trim().toLowerCase();
+
+                    if (
+                        btnText === "safety" ||
+                        btnText === "science" ||
+                        btnText === "balanced"
+                    ) {
+                        btn.classList.remove("priority-active");
+                    }
+
+                });
+
+                // Set selected button
+                this.classList.add("priority-active");
+
+                // Regenerate route
+                generateRoute();
+
+            });
+
+        }
+
+    });
+
+}
 
     const points =
         routeCoordinates[region];
@@ -776,10 +820,11 @@ setupGenerateButton();
 
 setupLocationChanges();
 
+setupPriorityButtons();
+
 updateNASAImagery();
 
 generateRoute();
-
 
 console.log(
     "VAANORA initialized with NASA Mars Trek data."

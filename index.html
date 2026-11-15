@@ -1,2 +1,246 @@
-<link rel="stylesheet" href="style.css">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Vaanora | Martian Surface Intelligence</title>
+
+    <link rel="stylesheet"
+          href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIINfQ3hT4J6s4sY8M4m8vH0YqT8x1yQ4k="
+          crossorigin=""/>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+        <div class="brand">
+            <div class="logo">V</div>
+            <div>
+                <h1>VAANORA</h1>
+                <span>MARTIAN SURFACE INTELLIGENCE</span>
+            </div>
+        </div>
+
+        <div class="mission-badge">
+            NASA SPACE APPS 2026
+        </div>
+
+        <section class="panel-section">
+
+            <h3>MISSION PLANNER</h3>
+
+            <label>START LOCATION</label>
+
+            <select id="startLocation">
+                <option value="gale">Gale Crater</option>
+                <option value="jezero">Jezero Crater</option>
+                <option value="elysium">Elysium Planitia</option>
+            </select>
+
+            <label>DESTINATION</label>
+
+            <select id="destination">
+                <option value="mountsharp">Mount Sharp</option>
+                <option value="delta">Jezero Delta</option>
+                <option value="elysium">Elysium Region</option>
+            </select>
+
+            <label>MISSION PRIORITY</label>
+
+            <div class="priority-options">
+
+                <label class="radio">
+                    <input type="radio" name="priority" value="safety" checked>
+                    <span>Safety</span>
+                </label>
+
+                <label class="radio">
+                    <input type="radio" name="priority" value="science">
+                    <span>Science</span>
+                </label>
+
+                <label class="radio">
+                    <input type="radio" name="priority" value="balanced">
+                    <span>Balanced</span>
+                </label>
+
+            </div>
+
+            <button id="generateBtn" onclick="generateRoute()">
+                GENERATE MARSWALK
+            </button>
+
+        </section>
+
+
+        <section class="panel-section">
+
+            <h3>MAP LAYERS</h3>
+
+            <label class="layer">
+                <input type="checkbox" id="terrainToggle" checked
+                       onchange="toggleLayer('terrain')">
+                <span>Terrain</span>
+                <small>MOLA</small>
+            </label>
+
+            <label class="layer">
+                <input type="checkbox" id="scienceToggle" checked
+                       onchange="toggleMarkers('science')">
+                <span>Science Targets</span>
+                <small>NASA</small>
+            </label>
+
+            <label class="layer">
+                <input type="checkbox" id="hazardToggle" checked
+                       onchange="toggleMarkers('hazard')">
+                <span>Potential Hazards</span>
+                <small>Analysis</small>
+            </label>
+
+            <label class="layer">
+                <input type="checkbox" id="roverToggle" checked
+                       onchange="toggleMarkers('rover')">
+                <span>Mission Locations</span>
+                <small>NASA</small>
+            </label>
+
+        </section>
+
+
+        <section class="panel-section">
+
+            <h3>NASA DATA SOURCES</h3>
+
+            <div class="data-source">
+                <strong>MOLA</strong>
+                <span>Mars topography</span>
+            </div>
+
+            <div class="data-source">
+                <strong>MRO / HiRISE</strong>
+                <span>Surface imagery</span>
+            </div>
+
+            <div class="data-source">
+                <strong>NASA Mars Missions</strong>
+                <span>Science context</span>
+            </div>
+
+        </section>
+
+
+        <div class="footer">
+            <span>Vaanora © 2026</span>
+            <span>NASA Space Apps Challenge</span>
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN -->
+    <main class="main">
+
+        <header class="topbar">
+
+            <div>
+                <span class="eyebrow">INTERPLANETARY SURVIVAL GUIDE</span>
+                <h2>MARTIAN MAP</h2>
+            </div>
+
+            <div class="status">
+                <span class="status-dot"></span>
+                MISSION PLANNING MODE
+            </div>
+
+        </header>
+
+
+        <!-- MAP -->
+        <div id="map"></div>
+
+
+        <!-- MAP INFO -->
+        <div class="map-overlay">
+
+            <div class="coordinates">
+                <span>LAT</span>
+                <strong id="latValue">-5.40°</strong>
+
+                <span>LON</span>
+                <strong id="lonValue">137.80°</strong>
+            </div>
+
+            <div class="map-label">
+                GALE CRATER REGION
+            </div>
+
+        </div>
+
+
+        <!-- BOTTOM PANEL -->
+        <div class="bottom-panel">
+
+            <div class="route-status">
+
+                <div class="status-icon">✓</div>
+
+                <div>
+                    <span class="eyebrow">ROUTE ANALYSIS</span>
+                    <h3 id="routeTitle">Marswalk route ready</h3>
+                    <p id="routeDescription">
+                        Select mission parameters and generate a route.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div class="stats">
+
+                <div class="stat">
+                    <span>DISTANCE</span>
+                    <strong id="distance">12.4 km</strong>
+                </div>
+
+                <div class="stat">
+                    <span>ELEVATION</span>
+                    <strong id="elevation">+184 m</strong>
+                </div>
+
+                <div class="stat">
+                    <span>HAZARDS</span>
+                    <strong id="hazards">3</strong>
+                </div>
+
+                <div class="stat">
+                    <span>SCIENCE STOPS</span>
+                    <strong id="scienceStops">5</strong>
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+        crossorigin="">
+</script>
+
 <script src="script.js"></script>
+
+</body>
+</html>

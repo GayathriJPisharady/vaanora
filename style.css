@@ -413,3 +413,9 @@ button:hover {
     }
 
 }
+
+.priority-active {
+    border-color: #ffffff !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+}
